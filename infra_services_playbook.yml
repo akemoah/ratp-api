@@ -6,7 +6,7 @@
    - name: Installation nginx
      pacman: name=nginx state=present
    - name: Configuration loadbalancer
-     template: src=conf/loadbalancer-nginx-{{env}}.conf dest=/etc/nginx/nginx.conf
+     template: src=loadbalancer-nginx-{{env}}.conf dest=/etc/nginx/nginx.conf
    - name: Redemarrage nginx
      service: name=nginx state=restarted
 
