@@ -1,0 +1,26 @@
+- hosts: pegase.local
+  name: "** Frontend **"
+  gather_facts: True
+  sudo: yes
+  tasks:
+   - name: Installation nginx
+     pacman: name=nginx state=present
+   - name: Configuration loadbalancer
+     template: src=conf/loadbalancer-nginx-{{env}}.conf dest=/etc/nginx/nginx.conf
+   - name: Redemarrage nginx
+     service: name=nginx state=restarted
+
+- hosts: orion.local
+  name: "** Backend **"
+  gather_facts: True
+  sudo: yes
+  tasks:
+   - name: Installation Docker
+     apt: name=docker.io state=present
+   - name: Arret des containers
+     action: shell docker kill `docker ps -q`
+     ignore_errors: True
+   - name: Provisionnement du service (instance 1)
+     action: shell docker run --name loadbalancer -td -p 8080:8080 ksahnine/ratp-rest-api:1.0
+   - name: Provisionnement du service (instance 2)
+     action: shell docker run --name apitime -td -p 8081:8080 ksahnine/ratp-rest-api:1.0
